@@ -1,0 +1,199 @@
+{
+    "axes": [
+        {
+            "can_node_id": 1,
+            "home_offset": 147.0,
+            "mot_gear_ratio": -18.0,
+            "enc_gear_ratio": -1.0,
+            "nom_velocity": 25.0,
+            "max_velocity": 50.0,
+            "min_pos": -360.0,
+            "max_pos": 360.0,
+            "kp": 1.0,
+            "ki": 0.1,
+            "kd": 0.01,
+            "kv": 1.0,
+            "micro_step": 64,
+            "max_current": 500,
+            "guiding_gain": 50000,
+            "guiding_deadzone": 1000,
+            "error_limit": 20000
+        },
+        {
+            "can_node_id": 2,
+            "home_offset": -140.0,
+            "mot_gear_ratio": 31.0,
+            "enc_gear_ratio": -1.0,
+            "nom_velocity": 30.0,
+            "max_velocity": 60.0,
+            "min_pos": 60.0,
+            "max_pos": 360.0,
+            "kp": 1.0,
+            "ki": 0.1,
+            "kd": 0.01,
+            "kv": 1.0,
+            "micro_step": 16,
+            "max_current": 700,
+            "guiding_gain": 50000,
+            "guiding_deadzone": 1500,
+            "error_limit": 20000
+        },
+        {
+            "can_node_id": 3,
+            "home_offset": -150.0,
+            "mot_gear_ratio": 31.0,
+            "enc_gear_ratio": -1.0,
+            "nom_velocity": 30.0,
+            "max_velocity": 60.0,
+            "min_pos": -360.0,
+            "max_pos": 230.0,
+            "kp": 1.0,
+            "ki": 0.1,
+            "kd": 0.01,
+            "kv": 1.0,
+            "micro_step": 16,
+            "max_current": 700,
+            "guiding_gain": 50000,
+            "guiding_deadzone": 1500,
+            "error_limit": 20000
+        },
+        {
+            "can_node_id": 4,
+            "home_offset": 146.0,
+            "mot_gear_ratio": 32.0,
+            "enc_gear_ratio": -1.0,
+            "nom_velocity": 35.0,
+            "max_velocity": 70.0,
+            "min_pos": -200.0,
+            "max_pos": 200.0,
+            "kp": 10.0,
+            "ki": 0.1,
+            "kd": 0.01,
+            "kv": 1.0,
+            "micro_step": 64,
+            "max_current": 150,
+            "guiding_gain": 50000,
+            "guiding_deadzone": 500,
+            "error_limit": 10000
+        },
+        {
+            "can_node_id": 5,
+            "home_offset": -43.0,
+            "mot_gear_ratio": -48.0,
+            "enc_gear_ratio": -1.0,
+            "nom_velocity": 30.0,
+            "max_velocity": 30.0,
+            "min_pos": -360.0,
+            "max_pos": 360.0,
+            "kp": 10.0,
+            "ki": 0.1,
+            "kd": 0.01,
+            "kv": 1.0,
+            "micro_step": 64,
+            "max_current": 0,
+            "guiding_gain": 50000,
+            "guiding_deadzone": 1000,
+            "error_limit": 5000000
+        },
+        {
+            "can_node_id": 6,
+            "home_offset": 0.0,
+            "mot_gear_ratio": -20.0,
+            "enc_gear_ratio": -20.0,
+            "nom_velocity": 35.0,
+            "max_velocity": 70.0,
+            "min_pos": -360.0,
+            "max_pos": 360.0,
+            "kp": 10.0,
+            "ki": 0.1,
+            "kd": 0.01,
+            "kv": 1.0,
+            "micro_step": 64,
+            "max_current": 0,
+            "guiding_gain": 50000,
+            "guiding_deadzone": 1000,
+            "error_limit": 10000
+        },
+        {
+            "can_node_id": 7,
+            "home_offset": 0.0,
+            "mot_gear_ratio": 31.5,
+            "enc_gear_ratio": -31.5,
+            "nom_velocity": 50.0,
+            "max_velocity": 90.0,
+            "min_pos": -36000.0,
+            "max_pos": 36000.0,
+            "kp": 10.0,
+            "ki": 0.1,
+            "kd": 0.01,
+            "kv": 1.0,
+            "micro_step": 64,
+            "max_current": 100,
+            "guiding_gain": 5000,
+            "guiding_deadzone": 100,
+            "error_limit": 5000
+        }
+    ],
+    "tool": {
+        "matrix": [
+            [
+                0.0,
+                0.0,
+                -1.0,
+                -114.0
+            ],
+            [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                -1.0,
+                0.0,
+                29.5
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        ]
+    },
+    "tcp_offset": {
+        "matrix": [
+            [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        ]
+    },
+    "link": {
+        "B1": 292.5,
+        "A2": 173.0,
+        "B4": 218.0,
+        "B6": 82.0
+    }
+}

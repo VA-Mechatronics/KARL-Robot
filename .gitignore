@@ -1,0 +1,86 @@
+# -------------------------
+# Build-Ordner (C++ / CMake)
+# -------------------------
+
+/cpp/cpp_test/build/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/Makefile
+**/*.o
+**/*.obj
+**/*.exe
+**/*.dll
+**/*.lib
+**/*.a
+**/*.pdb
+
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+env/
+*.swp
+*.swo
+
+# Sphinx decumentation build
+docs/_build/
+
+# -------------------------
+# PyCharm / IDE Dateien
+# -------------------------
+.idea/
+*.iml
+
+# -------------------------
+# VS Code
+# -------------------------
+.vscode/*
+!.vscode/c_cpp_properties.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+# -------------------------
+# Arduino
+# -------------------------
+*.hex
+*.elf
+*.bin
+*.eep
+*.map
+*.log
+*.d
+*.tmp
+*.bak
+/.pio/                      # PlatformIO Build Folder
+/.build/                     # Arduino IDE Build Folder
+
+# -------------------------
+# Logs, Temp, Backup
+# -------------------------
+*.log
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Libraries (optional)
+# -------------------------
+# Header-only libs können versioniert oder ignoriert werden
+# /cpp/libs/eigen/
+# /arduino/libs/
+
+# -------------------------
+# Project
+# -------------------------
+workspace/
+workspace_archive/
