@@ -1,7 +1,7 @@
-KARL Robot API Documentation
+KARL-Robot Documentation
 ============================
 
-Welcome to the official documentation for the KARL Robotic Control System.
+Welcome to the official documentation for the KARL-Robot System.
 
 .. toctree::
    :maxdepth: 2

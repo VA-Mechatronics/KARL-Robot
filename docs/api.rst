@@ -1,6 +1,14 @@
 API Reference
 =============
 
+Expressive Python API: High-level pythonic API for automated tasks (moveJ, moveL, movePoly), TCP offsets, and skill mixins.
+
+.. image:: _static/api.gif
+   :alt: KARL Robot API Demo
+   :align: center
+   :width: 100%
+
+
 RobotAPI Main Interface
 ------------------------
 
@@ -27,14 +35,14 @@ Homing Skills
    :show-inheritance:
 
 Program Skills
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 .. automodule:: client.skills.program_skills
    :members:
    :undoc-members:
    :show-inheritance:
 
 Workspace Skills
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 .. automodule:: client.skills.workspace_skills
    :members:
    :undoc-members:

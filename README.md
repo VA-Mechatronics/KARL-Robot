@@ -1,4 +1,4 @@
-# KARL Robot
+# KARL-Robot
 
 [![Homepage](https://img.shields.io/badge/Website-vamechatronics.com-blue)](https://vamechatronics.com)
 [![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20Showcase-red)](https://www.youtube.com/@vamech)
