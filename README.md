@@ -1,7 +1,7 @@
 # KARL Robot
 
-[![Project Website](https://img.shields.io/badge/Website-vamechatronics.com-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://vamechatronics.com)
-[![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20Showcase-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@vamech)
+[![Homepage](https://img.shields.io/badge/Website-vamechatronics.com-blue)](https://vamechatronics.com)
+[![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20Showcase-red)](https://www.youtube.com/@vamech)
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue)](https://karl-robot.readthedocs.io)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](#)
