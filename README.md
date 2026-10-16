@@ -16,7 +16,7 @@
 The **KARL Robotic Control System** provides an end-to-end open-hardware robotics solution.
 It connects a Python client API and PySide6 Desktop GUI with a real-time motion controller backend and distributed hardware nodes over CAN.
 
-![KARL Robot Demo](docs/_static/demo.gif)
+![KARL Robot Demo](https://raw.githubusercontent.com/VA-Mechatronics/KARL-Robot/main/docs/_static/demo.gif)
 
 
 ### Key Highlights
