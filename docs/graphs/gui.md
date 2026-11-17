@@ -4,23 +4,23 @@
 classDiagram
     class MainWindow {
         +footer_info
-        +alive
-        +model_tab
         +telemetry_tab
-        +btn_homing
-        +ip_combo
-        +robot
-        +btn_connect
-        +btn_pwr_mcu
-        +btn_stop
-        +label_status
-        +configuration_tab
-        +sim_backend
-        +overwrite
-        +btn_guide
-        +control_tab
-        +log
+        +alive
         +automatic_tab
+        +sim_backend
+        +btn_connect
+        +label_status
+        +control_tab
+        +btn_guide
+        +btn_stop
+        +ip_combo
+        +log
+        +btn_pwr_mcu
+        +overwrite
+        +configuration_tab
+        +btn_homing
+        +model_tab
+        +robot
         +__init__(robot_api)
         +show_message(message, timeout_ms)
         +_apply_show_message(message, timeout_ms)
@@ -42,22 +42,22 @@ classDiagram
         +__init__(title)
     }
     class JogPageField {
-        +id
         +btn_jog_plus
+        +id
+        +btn_jog_minus
         +layout
+        +frame
         +robot
         +name
-        +btn_jog_minus
-        +frame
         +__init__(field_id, field_name, frame, robot_api)
     }
     class PositionPage {
-        +on_set_positions_changed
-        +robot
-        +commands
         +page_layout
+        +on_set_positions_changed
+        +commands
         +fields
         +frame
+        +robot
         +__init__(frame, field_ids, field_tile, field_names, robot_api)
         +_on_set_changed()
         +set_from_actual()
@@ -68,72 +68,72 @@ classDiagram
     }
     class PositionPageField {
         +id
-        +label_act_pos
-        +layout
-        +robot
         +box_set_pos
-        +name
-        +log
+        +layout
+        +label_act_pos
         +frame
+        +log
+        +robot
+        +name
         +__init__(field_id, field_name, frame, robot_api)
         +set_from_actual()
         +_on_target_from_api(payload)
     }
     QObject <|-- PositionPageField
     class PositionPageCommands {
-        +btn_move_linear
-        +btn_set_from_file
-        +layout
         +robot
         +btn_move_joint
-        +ws
-        +placeholder
         +btn_set_from_actual
+        +placeholder
+        +layout
+        +btn_move_linear
         +fields
         +frame
+        +btn_set_from_file
+        +ws
         +__init__(fields, frame, robot_api)
         +read_from_file()
     }
     class ModelPageCommands {
+        +robot
+        +layout
         +btn_act_to_file
         +btn_set_to_file
-        +layout
-        +robot
         +ws
         +__init__(robot_api)
         +write_to_file(target)
     }
     class MCUConfigPage {
-        +layout
         +fields
+        +layout
         +__init__(field_ids, robot_api)
     }
     class MCUConfigField {
-        +layout
-        +robot
         +field_id
+        +layout
         +btn_jump_to_bootloader
+        +robot
         +btn_set_zero
         +__init__(field_id, robot_api)
         +set_zero()
         +jump_to_bootloader()
     }
     class AutomaticTab {
-        +btn_append_moveJ_guide
-        +btn_refresh_programs
         +robot
-        +btn_push_workspace
-        +btn_clear_guide
-        +btn_restart_once
-        +btn_pull_workspace
-        +ws
-        +btn_restart_infinite
-        +combo_programs
         +btn_cancel
-        +btn_append_moveL_guide
-        +log
-        +btn_resume
+        +btn_pull_workspace
+        +btn_restart_once
+        +btn_append_moveJ_guide
+        +combo_programs
         +btn_pause
+        +btn_resume
+        +btn_push_workspace
+        +btn_append_moveL_guide
+        +btn_clear_guide
+        +log
+        +btn_restart_infinite
+        +ws
+        +btn_refresh_programs
         +__init__(robot_api)
         +resume()
         +pause()
@@ -183,8 +183,8 @@ classDiagram
     }
     BaseConfigTableModel <|-- DataclassKeyValTableModel
     class Matrix4x4TableModel {
-        +target_attr
         +matrix_attr
+        +target_attr
         +__init__(config, target_attr, matrix_attr)
         +matrix()
         +rowCount(parent)
@@ -196,22 +196,22 @@ classDiagram
     }
     BaseConfigTableModel <|-- Matrix4x4TableModel
     class ConfigurationTab {
-        +tool_model
-        +btn_read_from_mcu
-        +model
-        +table
-        +mcu_config_page
         +robot
-        +tcp_offset_model
-        +btn_write_to_file
-        +tool_table
+        +tool_model
         +tcp_offset_table
+        +btn_write_to_file
+        +mcu_config_page
+        +link_table
+        +btn_read_from_mcu
+        +tcp_offset_model
+        +model
+        +link_model
+        +table
+        +log
+        +btn_read_from_file
+        +tool_table
         +btn_write_to_mcu
         +ws
-        +link_model
-        +log
-        +link_table
-        +btn_read_from_file
         +__init__(robot_api)
         +_update_all_models()
         +read_from_file()
@@ -221,17 +221,17 @@ classDiagram
         +_on_config_from_api(payload)
     }
     class ControlTab {
-        +robot
-        +relative_container
-        +relative_mode
         +absolute_mode
-        +joint_position_page_object
+        +relative_mode
+        +absolute_stack
+        +relative_stack
         +base_position_page_object
         +absolute_container
-        +relative_stack
+        +joint_position_page_object
         +log
-        +absolute_stack
         +joint_position_page
+        +relative_container
+        +robot
         +__init__(robot_api)
         +update_relative_ui(text)
         +update_absolute_ui(text)
@@ -240,18 +240,18 @@ classDiagram
         +__init__()
     }
     class ModelTab {
-        +act_links
-        +act_bboxes
-        +act_tcp_frame
-        +model_page_commands
-        +robot
-        +set_tcp_frame
+        +set_links
         +view
+        +act_bboxes
+        +act_links
         +base_frame
+        +set_tcp_frame
+        +model_page_commands
+        +log
+        +act_tcp_frame
         +chk_show_bbox
         +ignored_pairs
-        +set_links
-        +log
+        +robot
         +__init__(robot_api)
         +_toggle_bbox_visibility(visible)
         +_on_target_from_api(payload)
@@ -264,20 +264,20 @@ classDiagram
         +_load_links(color, bbox_list)
     }
     class TelemetryTab {
-        +curves_1_set
         +plot_widget_1
-        +btn_stop_logger
-        +robot
         +_data_buffer
-        +legend_2
-        +btn_analyze
+        +curves_2
+        +legend_1
+        +btn_stop_logger
         +plot_widget_2
         +btn_start_logger
-        +curves_1_act
-        +legend_1
-        +log
-        +curves_2
+        +legend_2
         +_render_timer
+        +curves_1_act
+        +log
+        +curves_1_set
+        +btn_analyze
+        +robot
         +__init__(robot_api)
         +_start_telemetry_logger()
         +_stop_telemetry_logger()

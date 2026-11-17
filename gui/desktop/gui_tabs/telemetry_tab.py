@@ -112,7 +112,7 @@ class TelemetryTab(qtw.QWidget):
         """Instantiate and start logger service directly in a background thread."""
         if self._logger_thread and self._logger_thread.is_alive():
             return
-        pub_addr = self.robot.sub_addr
+        pub_addr = self.robot._sub_addr
         self._logger_service = TelemetryLoggerService(sub_addr=pub_addr)
         self._logger_thread = threading.Thread(target=self._logger_service.start, daemon=True)
         self._logger_thread.start()
@@ -148,9 +148,8 @@ class TelemetryTab(qtw.QWidget):
         if win and hasattr(win, "show_message"):
             win.show_message("Opening interactive Plotly trace in browser...")
 
-    def _on_telemetry_from_api(self, payload: dict) -> None:
+    def _on_telemetry_from_api(self, telemetry: RobotTelemetry) -> None:
         try:
-            telemetry = RobotTelemetry.from_dict(payload)
             timestamp = time.time()
 
             act_positions = [axis.act_pos for axis in telemetry.axes]

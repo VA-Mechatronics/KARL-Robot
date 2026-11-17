@@ -219,7 +219,7 @@ class ConfigurationTab(qtw.QWidget):
         layout.addWidget(axis_label)
         layout.addWidget(self.table, 1)
 
-        self.mcu_config_page = MCUConfigPage(range(1, 8), self.robot)
+        self.mcu_config_page = MCUConfigPage(range(7), self.robot)
         self.mcu_config_page.layout.setContentsMargins(115, 0, 0, 0)
         layout.addLayout(self.mcu_config_page.layout)
 
@@ -318,8 +318,8 @@ class ConfigurationTab(qtw.QWidget):
             msg = f"Config sent to MCU." if res else f"Config sent to MCU FAILED."
             win.show_message(msg)
 
-    def _on_config_from_api(self, payload):
-        self.config = RobotConfig.from_dict(payload).copy()
+    def _on_config_from_api(self, config: RobotConfig):
+        self.config = config.copy()
         self._update_all_models()
         win = self.window()
         if win and hasattr(win, "show_message"):

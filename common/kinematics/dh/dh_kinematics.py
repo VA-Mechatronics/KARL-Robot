@@ -56,7 +56,7 @@ class DHKinematics(BaseKinematics):
         R = T[0:3, 0:3]
         rpy = rotation_matrix_to_rpy(R)
 
-        pose = joints
+        pose = joints.copy()
         pose[:6] = [
             float(position[0]),
             float(position[1]),

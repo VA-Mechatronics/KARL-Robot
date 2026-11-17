@@ -12,6 +12,7 @@ class HoldingState(BaseState):
     def enter(self, controller: RobotController, info=None):
         super().enter(controller, info)
         controller.hw.set_enable(True)
+        controller.traj_cleanup()
 
     def run(self, controller: RobotController):
         controller.hw.update_telemetry()

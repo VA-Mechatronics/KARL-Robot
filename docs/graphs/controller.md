@@ -2,17 +2,22 @@
 
 ```mermaid
 classDiagram
+    class CANError {
+    }
+    Exception <|-- CANError
     class HWController {
-        +telemetry
-        +io_controller
-        +config
         +_ack_lock
-        +_pending_acks
-        +_ack_event
+        +config
         +sync_counter
+        +simulation
+        +telemetry
         +log
+        +_ack_event
+        +controller
+        +_pending_acks
         +last_telemetry
-        +__init__(io_controller)
+        +__init__(controller)
+        +_send(msg)
         +motion(timestamp, pos, vel)
         +update_telemetry(update_time)
         +get_joints_position()
@@ -37,40 +42,44 @@ classDiagram
     class SmartEvent {
     }
     IntEnum <|-- SmartEvent
+    class NCError {
+    }
+    Exception <|-- NCError
     class IOController {
         +controller
-        +log
         +last_event
+        +log
         +__init__(controller)
         +update()
         +_check_e_stop()
         +handle_input_event(can_node_id, input_id, smart_event)
     }
     class RobotController {
-        +recorder
-        +states
-        +runner
-        +overwrite
-        +motion_duration
-        +sm
-        +motion_finished_sent
+        +ctx
         +_last_motion_cmd
-        +motion_start_time
-        +hw
+        +runner
         +pos_traj
-        +pull
+        +workspace
         +rep
-        +kinematics
-        +vel_traj
         +_running
         +io
-        +_run_thread
+        +hw
+        +simulation
+        +motion_start_time
+        +overwrite
+        +kinematics
+        +vel_traj
         +trajectory_time
+        +sm
+        +states
+        +_run_thread
+        +recorder
         +pub
-        +workspace
-        +ctx
+        +pull
         +log
-        +__init__()
+        +motion_duration
+        +__init__(simulation)
+        +traj_cleanup()
         +_run_loop()
         +publish_state(name, info)
         +publish_telemetry()
@@ -135,10 +144,10 @@ classDiagram
     }
     BaseState <|-- MovingState
     class StoppingState {
-        +last_vel
         +deceleration_time
         +last_pos
         +initial_trajectory_time
+        +last_vel
         +__init__()
         +enter(controller, info)
         +run(controller)

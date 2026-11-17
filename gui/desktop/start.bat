@@ -8,11 +8,8 @@ cd ..\..
 :: Activate the virtual environment using "call" to keep this script running
 call venv\Scripts\activate
 
-:: Set the PYTHONPATH to the current directory (project root)
-set PYTHONPATH=.
-
 :: Run the script using the activated environment
-python gui\desktop\main.py
+python -m gui.desktop.main
 
 :: Keep the window open to read error logs or output
 pause

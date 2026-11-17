@@ -189,16 +189,43 @@ class MainWindow(qtw.QWidget):
 
     def _start_sim_backend(self):
         self._stop_sim_backend()
-        file_path = BASE_DIR / "backend" / "main.py"
         if platform.system() == "Windows":
             self.sim_backend = subprocess.Popen(
-                ["cmd.exe", "/K", sys.executable, str(file_path)],
+                ["cmd.exe", "/K", sys.executable, "-m", "backend.main_simulation"],
                 creationflags=subprocess.CREATE_NEW_CONSOLE,
+                cwd=str(BASE_DIR),
             )
         elif platform.system() == "Linux":
-            self.sim_backend = subprocess.Popen(
-                ["x-terminal-emulator", "-e", sys.executable, str(file_path)],
-            )
+            import shutil
+
+            terminal_bin = None
+            for term in ["lxterminal", "x-terminal-emulator", "xterm", "gnome-terminal", "mate-terminal", "alacritty"]:
+                if shutil.which(term):
+                    terminal_bin = term
+                    break
+
+            if terminal_bin:
+                cmd_str = f"'{sys.executable}' -m backend.main_simulation; echo '--- Backend terminated ---'; exec bash"
+
+                if terminal_bin == "lxterminal":
+                    args = ["lxterminal", "-t", "KARL 2 Sim Backend", "-e", f"bash -c \"{cmd_str}\""]
+                elif terminal_bin == "gnome-terminal":
+                    args = ["gnome-terminal", "--", "bash", "-c", cmd_str]
+                else:
+                    args = [terminal_bin, "-e", "bash", "-c", cmd_str]
+
+                self.sim_backend = subprocess.Popen(
+                    args,
+                    cwd=str(BASE_DIR),
+                )
+            else:
+                log_file = open(BASE_DIR / "sim_backend.log", "w")
+                self.sim_backend = subprocess.Popen(
+                    [sys.executable, "-m", "backend.main_simulation"],
+                    cwd=str(BASE_DIR),
+                    stdout=log_file,
+                    stderr=subprocess.STDOUT,
+                )
 
     def _stop_sim_backend(self):
         if self.sim_backend is None:
@@ -231,7 +258,7 @@ class MainWindow(qtw.QWidget):
         self.label_status.setText(f"Connecting to {selected_ip}...")
         qtw.QApplication.processEvents()
         qtc.QTimer.singleShot(delay, lambda: self.robot.connect(selected_ip))
-        qtc.QTimer.singleShot(delay+500,  lambda: self.control_tab.joint_position_page_object.set_from_actual())
+        qtc.QTimer.singleShot(delay+500, lambda: self.control_tab.joint_position_page_object.set_from_actual())
 
     def closeEvent(self, event):
         self._stop_sim_backend()

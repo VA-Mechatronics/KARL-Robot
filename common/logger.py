@@ -9,6 +9,8 @@ os.makedirs(LOG_DIR, exist_ok=True)
 
 def setup_logging():
     logger = logging.getLogger()
+    if logger.handlers:
+        return  # No duplicate logging
     logger.setLevel(logging.INFO)
 
     formatter = colorlog.ColoredFormatter(

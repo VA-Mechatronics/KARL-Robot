@@ -5,7 +5,6 @@ from PySide6.QtGui import QVector3D
 import pyqtgraph.opengl as gl
 import numpy as np
 from scipy.spatial.transform import Rotation as R
-import stl  # numpy-stl
 import trimesh
 
 from gui.desktop.gui_core.control_fields import ModelPageCommands
@@ -72,8 +71,7 @@ class ModelTab(qtw.QWidget):
         for bbox in self.act_bboxes:
             bbox.setVisible(visible)
 
-    def _on_target_from_api(self, payload):
-        target = Target.from_dict(payload)
+    def _on_target_from_api(self, target: Target):
         transformations = self.robot.kinematics.joints_to_transformations(target.joints)
         self._update_robot(transformations, target.joints[6], self.act_links, self.act_tcp_frame, self.act_bboxes)
 

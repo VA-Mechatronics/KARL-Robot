@@ -21,13 +21,12 @@ class StoppingState(BaseState):
 
     def enter(self, controller: RobotController, info=None):
         super().enter(controller, info)
-        self.initial_trajectory_time = controller.trajectory_time
-        if controller.pos_traj and controller.vel_traj:
+        if controller.motion_start_time and controller.trajectory_time and controller.pos_traj and controller.vel_traj:
+            self.initial_trajectory_time = controller.trajectory_time
             self.last_pos = np.array([f(controller.trajectory_time) for f in controller.pos_traj])
             self.last_vel = np.array([f(controller.trajectory_time) for f in controller.vel_traj])
         else:
-            self.last_pos = np.array(controller.hw.get_joints_position())
-            self.last_vel = np.array(controller.hw.get_joints_velocity())
+            controller.set_state("holding")
 
     def run(self, controller: RobotController):
         controller.hw.update_telemetry()
@@ -52,8 +51,8 @@ class StoppingState(BaseState):
 
             if (target_pos < min_limits).any() or (target_pos > max_limits).any():
                 controller.hw.hard_stop()
-                controller.set_state("error")
                 self.log.error(f"position limit reached ad t={controller.trajectory_time:.3f}s! Pos: {target_pos}")
+                controller.set_state("error")
                 break
 
             controller.hw.motion(timestamp, target_pos, target_vel)
@@ -66,6 +65,4 @@ class StoppingState(BaseState):
                 break
 
     def exit(self, controller: RobotController):
-        controller.pos_traj = None
-        controller.vel_traj = None
-        # controller.hw.hard_stop(set_enable=True)
+        controller.traj_cleanup()

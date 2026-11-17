@@ -1,15 +1,11 @@
-from __future__ import annotations
-
 import logging
-import sys
 import time
-from typing import TYPE_CHECKING
 from enum import IntEnum
+import subprocess
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from backend.controller.robot_controller import RobotController
-if sys.platform.startswith("linux"):
-    import subprocess
 
 
 class SmartEvent(IntEnum):
@@ -20,18 +16,22 @@ class SmartEvent(IntEnum):
     RELEASE = 4
 
 
+class NCError(Exception):
+    pass
+
+
 class IOController:
-    def __init__(self, controller: RobotController):
+    def __init__(self, controller: "RobotController"):
         self.log = logging.getLogger(__name__)
         self.controller = controller
         self.last_event = time.time()
 
     def update(self) -> None:
         if self._check_e_stop() and self.controller.sm.state.name != "error":
-            self.controller.set_state("error", "E-Stop active")
+            raise NCError("NC-Loop open")
 
     def _check_e_stop(self) -> bool:
-        if sys.platform.startswith("linux"):
+        if not self.controller.simulation:
             res = subprocess.run(['pinctrl', 'get', '6'], capture_output=True, text=True)   # Raspberrypi GPIO read-in
             return not ('hi' in res.stdout)
         else:

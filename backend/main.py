@@ -5,7 +5,7 @@ from backend.controller.robot_controller import RobotController
 
 def main():
     setup_logging()
-    controller = RobotController()
+    controller = RobotController(simulation=False)
 
     try:
         while True:

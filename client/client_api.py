@@ -1,4 +1,5 @@
 import logging
+from common.logger import setup_logging
 import threading
 import time
 import numpy as np
@@ -25,6 +26,7 @@ StateName: TypeAlias = Literal["boot", "error", "guiding", "holding", "idle", "m
 
 class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
     def __init__(self):
+        setup_logging()
         super().__init__()
         self.log = logging.getLogger(__name__)
         self._last_msg = 0
@@ -148,8 +150,8 @@ class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
                 callback: Function invoked when a new event payload is received.
 
             Examples:
-                >>> def print_telemetry(payload):
-                ...     print(f"Received telemetry: {payload}")
+                >>> def print_telemetry(telemetry: RobotTelemetry):
+                ...     print(f"Received telemetry: {telemetry}")
                 ...
                 >>> robot.on("telemetry", print_telemetry)
             """
@@ -169,13 +171,19 @@ class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
             case "state":
                 self._state = payload
                 self._info = msg.get("info")
+                self._emit("state", payload, self._info)
             case "telemetry":
                 self._telemetry = RobotTelemetry.from_dict(payload)
+                self._emit("telemetry", self._telemetry)
             case "target":
                 self._act_target = Target.from_dict(payload)
+                self._emit("target", self._act_target)
             case "config":
                 self.kinematics.config = RobotConfig.from_dict(payload)
-        self._emit(event, payload)
+                self._emit("config", self.kinematics.config)
+            case _:
+                self._emit(event, payload)
+                self.log.info(f"API event: {event}  payload: {payload}")
         self._last_msg = time.time()
 
     def _recv_loop(self):
@@ -303,7 +311,8 @@ class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
 
     def stop(self) -> None:
         """Switch controller to stopping state"""
-        self._send_cmd({"cmd": "stop"})
+        # self._send_cmd({"cmd": "stop"})
+        self._push.send_json({"cmd": "stop"})
 
     _JOINT_MAP: dict[str, int] = {"j1": 0, "j2": 1, "j3": 2, "j4": 3, "j5": 4, "j6": 5, "j7": 6, "tool": 6}
     _AXIS_MAP: dict[str, int] = {"x": 0, "y": 1, "z": 2, "A": 3, "B": 4, "C": 5}
@@ -451,7 +460,7 @@ class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
         Examples:
             >>> robot.error(info="optional custom error message")
         """
-        res = self._send_req_cmd({"cmd": "reset", "payload": info})
+        res = self._send_req_cmd({"cmd": "error", "payload": info})
         return res.get("status") == "ok"
 
     def reset(self) -> bool:
@@ -558,7 +567,7 @@ class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
         Examples:
             >>> robot.set_zero("j2")
         """
-        res = self._send_req_cmd({"cmd": "set_zero", "payload": self._JOINT_MAP[joint]})
+        res = self._send_req_cmd({"cmd": "set_zero", "payload": self._JOINT_MAP[joint]+1})
         return res.get("status") == "ok"
 
     def jump_to_bootloader(self, joint: JointName) -> bool:
@@ -570,7 +579,7 @@ class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
         Examples:
             >>> robot.jump_to_bootloader("j6")
         """
-        res = self._send_req_cmd({"cmd": "jump_to_bootloader", "payload": self._JOINT_MAP[joint]})
+        res = self._send_req_cmd({"cmd": "jump_to_bootloader", "payload": self._JOINT_MAP[joint]+1})
         return res.get("status") == "ok"
 
     def set_mcu_homing(self, joint: JointName) -> bool:
@@ -592,5 +601,5 @@ class RobotAPI(BasicSkills, HomingSkills, ProgramSkills, WorkspaceSkills):
             >>>     time.sleep(0.1)
             >>> print(f"Axis 5 is homed")
         """
-        res = self._send_req_cmd({"cmd": "start_homing", "payload": self._JOINT_MAP[joint]})
+        res = self._send_req_cmd({"cmd": "start_homing", "payload": self._JOINT_MAP[joint]+1})
         return res.get("status") == "ok"

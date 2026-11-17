@@ -32,15 +32,16 @@ class BasicSkills:
             >>> # minimal
             >>> robot.pick(target=custom_target)
         """
-        if approach is None:
-            self.gripper(open_gripper)
-            self.moveJ(target)
-            self.gripper(0)
-        else:
-            self.moveJ(approach, gripper=open_gripper)
-            self.moveL(target)
-            self.gripper(0)
-            self.moveL(approach)
+        with self.blocking_mode():
+            if approach is None:
+                self.gripper(open_gripper)
+                self.moveJ(target)
+                self.gripper(0)
+            else:
+                self.moveJ(approach, gripper=open_gripper)
+                self.moveL(target)
+                self.gripper(0)
+                self.moveL(approach)
 
     def place(self: "RobotAPI", target: Target, approach: Target = None, open_gripper: float = 100) -> None:
         """Place sequence with optional approach position.
@@ -66,14 +67,15 @@ class BasicSkills:
             >>> # minimal
             >>> robot.place(target=custom_target)
         """
-        if approach is None:
-            self.moveJ(target)
-            self.gripper(open_gripper)
-        else:
-            self.moveJ(approach)
-            self.moveL(target)
-            self.gripper(open_gripper)
-            self.moveL(approach)
+        with self.blocking_mode():
+            if approach is None:
+                self.moveJ(target)
+                self.gripper(open_gripper)
+            else:
+                self.moveJ(approach)
+                self.moveL(target)
+                self.gripper(open_gripper)
+                self.moveL(approach)
 
     def wrist_flip(self: "RobotAPI", flip: bool = False, target: Target = None) -> None:
         """Do Wrist Flip while optional moving to Target

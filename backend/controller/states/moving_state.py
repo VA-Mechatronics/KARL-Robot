@@ -18,12 +18,9 @@ class MovingState(BaseState):
 
         controller.motion_start_time = time.time()
         controller.trajectory_time = 0.0
-        controller.motion_finished_sent = False
 
-        if controller.pos_traj is None:
-            controller.set_state("error")
-        if controller.vel_traj is None:
-            controller.set_state("error")
+        if controller.pos_traj is None or controller.vel_traj is None:
+            controller.set_state("holding")
 
     def run(self, controller: RobotController):
         controller.hw.update_telemetry()
@@ -52,8 +49,8 @@ class MovingState(BaseState):
             pos_limit = np.where((target_pos < min_limits) | (target_pos > max_limits))[0]
             if len(pos_limit) > 0:
                 controller.hw.hard_stop()
-                controller.set_state("error", f"Joint {pos_limit + 1} position limit exceeded")
                 self.log.error(f"position limit reached at t={controller.trajectory_time:.3f}s! Pos: {target_pos}")
+                controller.set_state("error", f"Joint {pos_limit + 1} position limit exceeded")
                 break
 
             # PID Error limits
@@ -61,20 +58,12 @@ class MovingState(BaseState):
             err_limit = np.where(np.abs(error) > error_limits)[0]
             if len(err_limit) > 0:
                 controller.hw.hard_stop()
-                controller.set_state("error", f"Joint {err_limit + 1} error limit exceeded")
                 self.log.error(f"error limit reached at t={controller.trajectory_time:.3f}s! Error: {error[err_limit]}")
+                controller.set_state("error", f"Joint {err_limit + 1} error limit exceeded")
                 break
 
             controller.hw.motion(timestamp, target_pos, target_vel)
             controller.trajectory_time += 0.020
-
-        if (controller.trajectory_time >= controller.motion_duration) and not controller.motion_finished_sent:
-            timestamp = int(controller.motion_duration * 1000) & 0xFFFF
-            target_pos = np.array([f(controller.motion_duration) for f in controller.pos_traj])
-            target_vel = np.array([0.0 for _ in range(len(target_pos))])
-
-            controller.hw.motion(timestamp, target_pos, target_vel)
-            controller.motion_finished_sent = True
 
     def exit(self, controller: RobotController):
         pass

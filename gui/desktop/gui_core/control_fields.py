@@ -159,15 +159,14 @@ class PositionPageField(QObject):
     def set_from_actual(self):
         self.box_set_pos.setValue(float(self.label_act_pos.text()))
 
-    def _on_target_from_api(self, payload):
-        target = Target.from_dict(payload)
+    def _on_target_from_api(self, target: Target):
         match self.frame:
             case "joint":
                 pos = target.joints
                 self.label_act_pos.setText(f"{pos[self.id]: .3f}")
             case "base":
-                pos = self.robot.kinematics.joints_to_pose(target.joints)
-                self.label_act_pos.setText(f"{pos[self.id]: .3f}")
+                pose = self.robot.kinematics.joints_to_pose(target.joints)
+                self.label_act_pos.setText(f"{pose[self.id]: .3f}")
 
 
 class PositionPageCommands:
@@ -297,13 +296,15 @@ class MCUConfigField:
         res = self.robot.set_zero(f"j{self.field_id+1}")
         win = self.btn_set_zero.window()
         if win and hasattr(win, "show_message"):
-            msg = f"MCU {self.field_id} set to zero." if res else f"MCU {self.field_id} set to zero FAILED."
+            msg = f"MCU {self.field_id+1} set to zero." if res else f"MCU {self.field_id+1} set to zero FAILED."
+            win.show_message(msg)
 
     def jump_to_bootloader(self):
         res = self.robot.jump_to_bootloader(f"j{self.field_id+1}")
         win = self.btn_set_zero.window()
         if win and hasattr(win, "show_message"):
-            msg = f"MCU {self.field_id} set to bootloader." if res else f"MCU {self.field_id} set to bootloader FAILED."
+            msg = f"MCU {self.field_id+1} set to bootloader." if res else f"MCU {self.field_id+1} set to bootloader FAILED."
+            win.show_message(msg)
 
 # endregion
 

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "karl_2"
+version = "0.1.0"
+description = "Karl Robot API Client"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "VA-Mechatronics" }
+]
+dependencies = [
+    "pyzmq",
+    "numpy",
+    "scipy",
+]
+
+[project.urls]
+Homepage = "https://github.com/VA-Mechatronics/KARL-Robot"
+Documentation = "https://karl-robot.readthedocs.io/en/latest/api.html"
+Repository = "https://github.com/VA-Mechatronics/KARL-Robot"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["karl_robot", "karl_robot.*", "client", "client.*", "common", "common.*"]

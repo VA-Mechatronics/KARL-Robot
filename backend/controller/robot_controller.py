@@ -12,8 +12,8 @@ from backend.controller.states.guiding_state import GuidingState
 from backend.controller.states.stopping_state import StoppingState
 from backend.controller.states.error_state import ErrorState
 
-from backend.controller.hw_controller import HWController
-from backend.controller.io_controller import IOController
+from backend.controller.hw_controller import HWController, CANError
+from backend.controller.io_controller import IOController, NCError
 
 from common.workspace_manager import WorkspaceManager
 from backend.program_runner import ProgramRunner
@@ -30,8 +30,9 @@ from common.target import Target
 
 
 class RobotController:
-    def __init__(self):
+    def __init__(self, simulation: bool = False):
         self.log = logging.getLogger(__name__)
+        self.simulation = simulation
         self.ctx = zmq.Context.instance()
 
         self.pull = self.ctx.socket(zmq.PULL)
@@ -58,23 +59,28 @@ class RobotController:
         # Controller kinematics check for same in API
         self.kinematics = DHKinematics()
 
-        self.io = IOController(controller=self)
-        self.hw = HWController(io_controller=self.io)
-        self.sm = StateMachine(controller=self, initial_state=self.states["boot"])
-
         self.pos_traj = None
         self.vel_traj = None
-        self.motion_start_time = 0.0
+        self.motion_start_time = None
+        self.trajectory_time = None
         self.motion_duration = 0.0
-        self.trajectory_time = 0.0
-        self.motion_finished_sent = False
         self.overwrite = 1.0
         self._last_motion_cmd = None
+
+        self.io = IOController(controller=self)
+        self.hw = HWController(controller=self)
+        self.sm = StateMachine(controller=self, initial_state=self.states["boot"])
 
         self._running = True
         self._run_thread = threading.Thread(target=self._run_loop, daemon=True)
         self._run_thread.start()
         self.log.info(f"Robot Controller Backend started")
+
+    def traj_cleanup(self):
+        self.pos_traj = None
+        self.vel_traj = None
+        self.motion_start_time = None
+        self.trajectory_time = None
 
     def _run_loop(self):
         time.sleep(1.0)
@@ -84,41 +90,52 @@ class RobotController:
         while self._running:
             fast_start = time.time()
 
+            # Async PUSH Socket
+            while True:
+                try:
+                    cmd = self.pull.recv_json(flags=zmq.NOBLOCK)
+                    self.handle_cmd(cmd)
+                except zmq.Again:
+                    break
+                except Exception as e:
+                    self.log.error(f"async {e}")
+
+            # Sync REQ/REP Socket
+            while True:
+                try:
+                    cmd = self.rep.recv_json(flags=zmq.NOBLOCK)
+                    self.handle_sync_cmd(cmd)
+                except zmq.Again:
+                    break
+                except Exception as e:
+                    self.log.error(f"Error {e}")
+                    self._rep_sync({"status": "error", "message": str(e)})
+
             try:
-                # Async PUSH Socket
-                while True:
-                    try:
-                        cmd = self.pull.recv_json(flags=zmq.NOBLOCK)
-                        self.handle_cmd(cmd)
-                    except zmq.Again:
-                        break
-
-                # Sync REQ/REP Socket
-                while True:
-                    try:
-                        cmd = self.rep.recv_json(flags=zmq.NOBLOCK)
-                        self.handle_sync_cmd(cmd)
-                    except zmq.Again:
-                        break
-
-                # motion
                 self.io.update()
                 self.sm.update()
-
-                # publish interval
-                if time.time() - last_publish_time >= publish_interval:
-                    last_publish_time = time.time()
-                    self.publish_state(self.sm.state.name)
-                    self.publish_telemetry()
-                    self.publish_target()
-
+            except CANError as e:
+                if self.sm.state.name != "error" or self.sm.state.info in ["NC-Loop open"]:
+                    self.set_state("error", info=str(e))
+            except NCError as e:
+                if self.sm.state.name != "error":
+                    self.set_state("error", info=str(e))
             except Exception as e:
                 self.log.error(f"Robot Controller Error: {e}")
+
+            # publish interval
+            if time.time() - last_publish_time >= publish_interval:
+                last_publish_time = time.time()
+                try:
+                    self.publish_state(self.sm.state.name, self.sm.state.info)
+                    self.publish_telemetry()
+                    self.publish_target()
+                except Exception as e:
+                    self.log.error(f"Publish error: {e}")
 
             # fast interval
             elapsed = time.time() - fast_start
             sleep_time = fast_interval - elapsed
-            # self.log.info(f"fast_duration: {elapsed:.4f}")
             if sleep_time > 0:
                 time.sleep(sleep_time)
 
@@ -231,7 +248,12 @@ class RobotController:
     # region *** Sync Commands ***
     def _rep_sync(self, msg: dict, reply: bool = True):
         if reply:
-            self.rep.send_json(msg)
+            try:
+                self.rep.send_json(msg)
+            except zmq.ZMQError as e:
+                self.rep.close(linger=0)
+                self.rep = self.ctx.socket(zmq.REP)
+                self.rep.bind("tcp://*:5557")
 
     def handle_sync_cmd(self, cmd: dict, reply: bool = True):
         self.log.info(f"handle_sync_cmd: {cmd}")
@@ -256,10 +278,13 @@ class RobotController:
                 self._rep_sync({"status": "ok", "overwrite": self.overwrite}, reply)
             case "read_config":
                 config = self.hw.get_config()
-                self.kinematics.config = config
-                self.log.info(f"read config from MCU: {config.to_dict()}")
-                self.pub.send_json({"event": "config", "payload": config.to_dict()})
-                self._rep_sync({"status": "ok", "config": config.to_dict()}, reply)
+                if config is not None:
+                    self.kinematics.config = config
+                    self.log.info(f"read config from MCU: {config.to_dict()}")
+                    self.pub.send_json({"event": "config", "payload": config.to_dict()})
+                    self._rep_sync({"status": "ok", "config": config.to_dict()}, reply)
+                else:
+                    self._rep_sync({"status": "nok"}, reply)
             case "write_config":
                 config = RobotConfig.from_dict(cmd.get("payload"))
                 success = self.hw.set_config(config)
@@ -283,7 +308,6 @@ class RobotController:
             case "jump_to_bootloader":
                 mcu_id = cmd.get("payload")
                 self.hw.jump_to_bootloader(mcu_id)
-                self.set_state("boot")
                 self._rep_sync({"status": "ok"}, reply)
             case "start_homing":
                 mcu_id = cmd.get("payload")

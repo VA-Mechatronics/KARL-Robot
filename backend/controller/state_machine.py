@@ -11,8 +11,8 @@ class StateMachine:
 
     def transition(self, new_state, info=None):
         if self.state.name == "error":
-            if new_state.name not in ["boot", "idle", "stopping"]:
-                self.log.error(f"Transition to {new_state.name} in Error State not allowed, try Reset or Stop")
+            if new_state.name not in ["error", "boot", "idle", "stopping", "guiding"]:
+                self.log.error(f"Transition to {new_state.name} in error state not allowed, try Reset or Stop")
                 return
         self.log.info(f"exit {self.state.name}")
         self.state.exit(self.controller)

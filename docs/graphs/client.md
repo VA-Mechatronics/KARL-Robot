@@ -3,26 +3,26 @@
 ```mermaid
 classDiagram
     class RobotAPI {
+        +_state
+        +_push_addr
+        +_info
+        +_req_addr
+        +_blocking
         +set_target
-        +_sub_addr
+        +_sub
+        +kinematics
+        +_act_target
+        +_callbacks
+        +_push
         +_is_paused
         +_req
-        +_push_addr
-        +_is_running
-        +_req_addr
-        +log
-        +_callbacks
-        +_last_msg
         +_ctx
-        +_info
-        +_telemetry
-        +kinematics
-        +_blocking
-        +_sub
-        +_act_target
+        +_is_running
+        +_sub_addr
         +_recv_thread
-        +_push
-        +_state
+        +_telemetry
+        +_last_msg
+        +log
         +__init__()
         +connect(host, push_port, sub_port, req_port)
         +disconnect()
@@ -65,14 +65,15 @@ classDiagram
     BasicSkills <|-- RobotAPI
     HomingSkills <|-- RobotAPI
     ProgramSkills <|-- RobotAPI
+    WorkspaceSkills <|-- RobotAPI
     class BasicSkills {
         +pick(target, approach, open_gripper)
         +place(target, approach, open_gripper)
         +wrist_flip(flip, target)
     }
     class HomingManager {
-        +prev_pos
         +robot
+        +prev_pos
         +homing_state
         +__init__(robot_api)
         +_on_homing_from_api(payload)
@@ -91,7 +92,7 @@ classDiagram
         +clear_guide()
         +record_guide_target(move_type)
     }
-    class ProgramSkills {
+    class WorkspaceSkills {
         +push_workspace(b64_payload)
         +pull_workspace()
     }

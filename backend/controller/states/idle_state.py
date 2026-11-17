@@ -12,9 +12,10 @@ class IdleState(BaseState):
     def enter(self, controller: RobotController, info=None):
         super().enter(controller, info)
         controller.hw.set_enable(False)
+        controller.traj_cleanup()
 
     def run(self, controller: RobotController):
         controller.hw.update_telemetry()
 
     def exit(self, controller: RobotController):
-        controller.hw.hard_stop(set_enable=False)
+        pass
